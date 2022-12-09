@@ -27,54 +27,49 @@ mod tests {
     }
 
     fn count_tail_positions(path: &Vec<Direction>, knots: usize) -> usize {
-        let mut knots_x = vec![];
-        let mut knots_y = vec![];
-        for _ in 0..knots {
-            knots_x.push(0i64);
-            knots_y.push(0i64);
-        }
-        let mut tail_positions = HashSet::from([(*knots_x.last().unwrap(), *knots_y.last().unwrap())]);
+        let mut knots = vec![(0, 0); knots];
+        let mut tail_positions = HashSet::from([(0i64, 0i64)]);
 
         for direction in path {
-            let (mut head_x, mut head_y) = match direction {
+            let mut head = match direction {
                 Direction::UP(count) => (0, *count),
                 Direction::DOWN(count) => (0, -*count),
                 Direction::LEFT(count) => (-*count, 0),
                 Direction::RIGHT(count) => (*count, 0),
             };
-            while (head_x, head_y) != (0, 0) {
-                if head_x > 0 {
-                    head_x -= 1;
-                    knots_x[0] += 1;
-                } else if head_x < 0 {
-                    head_x += 1;
-                    knots_x[0] -= 1;
-                } else if head_y > 0 {
-                    head_y -= 1;
-                    knots_y[0] += 1;
-                } else if head_y < 0 {
-                    head_y += 1;
-                    knots_y[0] -= 1;
+            while head != (0, 0) {
+                if head.0 > 0 {
+                    head.0 -= 1;
+                    knots[0].0 += 1;
+                } else if head.0 < 0 {
+                    head.0 += 1;
+                    knots[0].0 -= 1;
+                } else if head.1 > 0 {
+                    head.1 -= 1;
+                    knots[0].1 += 1;
+                } else if head.1 < 0 {
+                    head.1 += 1;
+                    knots[0].1 -= 1;
                 }
-                for i in 1..knots {
-                    if !is_touching(knots_x[i - 1], knots_y[i - 1], knots_x[i], knots_y[i]) {
-                        let (x, y) = move_follower(knots_x[i - 1], knots_y[i - 1], knots_x[i], knots_y[i]);
-                        knots_x[i] += x;
-                        knots_y[i] += y;
+                for i in 1..knots.len() {
+                    if !is_touching(knots[i - 1], knots[i]) {
+                        let (x, y) = move_follower(knots[i - 1], knots[i]);
+                        knots[i].0 += x;
+                        knots[i].1 += y;
                     }
                 }
-                tail_positions.insert((*knots_x.last().unwrap(), *knots_y.last().unwrap()));
+                tail_positions.insert(*knots.last().unwrap());
             }
         }
         tail_positions.len()
     }
 
-    fn is_touching(head_x: i64, head_y: i64, tail_x: i64, tail_y: i64) -> bool {
-        (head_x - tail_x).abs() <= 1 && (head_y - tail_y).abs() <= 1
+    fn is_touching(head: (i64, i64), tail: (i64, i64)) -> bool {
+        (head.0 - tail.0).abs() <= 1 && (head.1 - tail.1).abs() <= 1
     }
 
-    fn move_follower(head_x: i64, head_y: i64, tail_x: i64, tail_y: i64) -> (i64, i64) {
-        ((head_x - tail_x).clamp(-1, 1), (head_y - tail_y).clamp(-1, 1))
+    fn move_follower(head: (i64, i64), tail: (i64, i64)) -> (i64, i64) {
+        ((head.0 - tail.0).clamp(-1, 1), (head.1 - tail.1).clamp(-1, 1))
     }
 
     fn load_path(file: &str) -> Result<Vec<Direction>> {
