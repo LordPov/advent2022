@@ -86,7 +86,7 @@ mod tests {
     fn part_1_test() -> Result<()> {
         let strengths = find_signal_strengths(&load_instructions("day10ex.txt")?, vec![20, 60, 100, 140, 180, 220]);
         assert_eq!(vec![420, 1140, 1800, 2940, 2880, 3960], strengths);
-        assert_eq!(13140i64, strengths.iter().sum());
+        assert_eq!(13140i64, strengths.iter().sum::<i64>());
         Ok(())
     }
 
