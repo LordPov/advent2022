@@ -118,8 +118,8 @@ mod tests {
             let opponent: Move = chars.nth(0).unwrap().try_into()?;
             let outcome: GameResult = chars.nth(1).unwrap().try_into()?;
 
-            score += outcome as i32;
             score += outcome.required(opponent) as i32;
+            score += outcome as i32;
         }
         println!("Total score is: {}", score);
 
